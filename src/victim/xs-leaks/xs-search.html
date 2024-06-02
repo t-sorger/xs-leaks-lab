@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XSLL - Victim - XS Search</title>
+</head>
+
+<body>
+    <h1>XS Search</h1>
+    <ul>
+        <li><a href="../index.html">Home</a></li>
+    </ul>
+
+    <h2>Introduction</h2>
+    <p>This page will help demonstrate a XS Search attack.</p>
+    <h2>Webpage</h2>
+    <p>Here you can search for pictures.</p>
+    <p>Available pictures are: "pwd", "sec".</p>
+
+    <form id="search-form">
+        <input type="text" id="search-query" name="q" placeholder="Search...">
+        <button type="submit">Search</button>
+    </form>
+    <div id="time"></div>
+    <div id="results"></div>
+    <script>
+        // Hard coded image names for simplicity
+        const data = ['pwd', 'sec'];
+        async function performSearch(query) {
+            // Get the start time
+            const startTime = performance.now();
+
+            const resultsDiv = document.getElementById('results');
+            // Clear the existing pictures
+            resultsDiv.innerHTML = '';
+
+            let resultsFound = false;
+
+            for (let i = 0; i < data.length; i++) {
+                const str = data[i];
+                // Rest of the code inside the loop
+                if (str == query || str.startsWith(query)) {
+                    if (!resultsFound) {
+                        resultsFound = true;
+                        resultsDiv.innerHTML = `<p>Results found for "${query}"!</p>`;
+                    }
+
+                    // Create a new iframe element
+                    let iframe = document.createElement('iframe');
+                    // Set attributes for the iframe
+                    iframe.src = `../images/${str}.jpg`;
+                    iframe.frameBorder = 0;
+                    // Append the iframe to the resultsDiv
+                    resultsDiv.appendChild(iframe);
+                }
+            }
+
+            // Get the end time
+            const endTime = performance.now();
+            const executionTime = endTime - startTime;
+            // Calculate the execution time
+            document.getElementById('time').textContent = `Execution time: ${executionTime} milliseconds`;
+            console.log(`Execution time: ${executionTime} milliseconds`);
+        }
+
+        document.getElementById('search-form').addEventListener('submit', function (event) {
+            event.preventDefault();
+            const query = document.getElementById('search-query').value;
+            performSearch(query);
+        });
+
+        document.addEventListener("DOMContentLoaded", function () {
+            // Function to get URL parameters
+            function getQueryParameter(name) {
+                const urlParams = new URLSearchParams(window.location.search);
+                return urlParams.get(name);
+            }
+
+            // Get the search parameter from the URL
+            const query = getQueryParameter('q');
+
+            // If there is a query parameter, set it as the value of the search box and perform the search
+            if (query) {
+                document.getElementById('search-query').value = query;
+                performSearch(query);
+            }
+        });
+    </script>
+</body>
+
+</html>
